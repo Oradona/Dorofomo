@@ -1,6 +1,7 @@
 const focusInput = document.getElementById("focusMinutes");
 const restInput = document.getElementById("restMinutes");
 const modeLabel = document.getElementById("modeLabel");
+const noticeText = document.getElementById("noticeText");
 const timerDisplay = document.getElementById("timerDisplay");
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
@@ -22,8 +23,8 @@ const STORAGE_KEY = "dorofomo-state-v1";
 
 let timerId = null;
 let isFocusMode = true;
-let timeLeftSeconds = Number(focusInput.value) * 60;
 let activeFocusSessionMinutes = clampMinutes(focusInput.value, 1, 180, 25);
+let timeLeftSeconds = activeFocusSessionMinutes * 60;
 
 let state = {
   xp: 0,
@@ -133,6 +134,10 @@ function updateTimerUI() {
   timerDisplay.textContent = formatTime(timeLeftSeconds);
 }
 
+function notify(message) {
+  noticeText.textContent = message;
+}
+
 function setTimeFromInputs() {
   const focusM = clampMinutes(focusInput.value, 1, 180, 25);
   const restM = clampMinutes(restInput.value, 1, 60, 5);
@@ -156,9 +161,9 @@ function tick() {
     pauseTimer();
     if (isFocusMode) {
       addXpForSession();
-      alert("집중 세션 완료! XP를 획득했습니다.");
+      notify("집중 세션 완료! XP를 획득했습니다.");
     } else {
-      alert("휴식 시간 완료! 다시 집중을 시작하세요.");
+      notify("휴식 시간 완료! 다시 집중을 시작하세요.");
     }
 
     isFocusMode = !isFocusMode;
@@ -193,6 +198,7 @@ function resetTimer() {
   pauseTimer();
   isFocusMode = true;
   setTimeFromInputs();
+  notify("");
 }
 
 function ensureAudioContext() {
@@ -295,12 +301,13 @@ asmrVolume.addEventListener("input", () => {
 });
 
 addFriendBtn.addEventListener("click", () => {
-  const name = friendName.value.trim();
+  const name = friendName.value.trim().slice(0, 20);
   const xp = Math.max(0, Math.floor(Number(friendXp.value) || 0));
   if (!name) return;
 
   const existing = state.friends.find((f) => f.name.toLowerCase() === name.toLowerCase());
   if (existing) {
+    existing.name = name;
     existing.xp = xp;
   } else {
     state.friends.push({ name, xp });
