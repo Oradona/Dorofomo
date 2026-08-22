@@ -198,6 +198,7 @@ function resetTimer() {
   pauseTimer();
   isFocusMode = true;
   setTimeFromInputs();
+  activeFocusSessionMinutes = clampMinutes(focusInput.value, 1, 180, 25);
   notify("");
 }
 
