@@ -302,15 +302,21 @@ asmrVolume.addEventListener("input", () => {
 
 addFriendBtn.addEventListener("click", () => {
   const name = friendName.value.trim().slice(0, 20);
-  const xp = Math.max(0, Math.floor(Number(friendXp.value) || 0));
+  const xp = Math.min(99999, Math.max(0, Math.floor(Number(friendXp.value) || 0)));
   if (!name) return;
 
   const existing = state.friends.find((f) => f.name.toLowerCase() === name.toLowerCase());
   if (existing) {
     existing.name = name;
     existing.xp = xp;
+    notify(`${name} 정보가 업데이트되었습니다.`);
   } else {
+    if (state.friends.length >= 100) {
+      notify("친구는 최대 100명까지 추가할 수 있습니다.");
+      return;
+    }
     state.friends.push({ name, xp });
+    notify(`${name} 친구가 추가되었습니다.`);
   }
 
   friendName.value = "";
