@@ -31,6 +31,7 @@ let state = {
 
 let audioCtx;
 let asmrNodes = [];
+let currentGainNode = null;
 
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -38,7 +39,21 @@ function loadState() {
   try {
     const parsed = JSON.parse(raw);
     if (typeof parsed.xp === "number") state.xp = Math.max(0, parsed.xp);
-    if (Array.isArray(parsed.friends)) state.friends = parsed.friends.slice(0, 100);
+    if (Array.isArray(parsed.friends)) {
+      state.friends = parsed.friends
+        .filter(
+          (friend) =>
+            friend &&
+            typeof friend.name === "string" &&
+            Number.isFinite(friend.xp) &&
+            friend.name.trim().length > 0
+        )
+        .map((friend) => ({
+          name: friend.name.trim().slice(0, 20),
+          xp: Math.max(0, Math.floor(friend.xp)),
+        }))
+        .slice(0, 100);
+    }
   } catch {
     // ignore broken storage
   }
@@ -151,7 +166,6 @@ function tick() {
       : clampMinutes(restInput.value, 1, 60, 5);
     timeLeftSeconds = nextMin * 60;
     updateTimerUI();
-    startTimer();
     return;
   }
   updateTimerUI();
@@ -194,6 +208,7 @@ function clearAsmrNodes() {
     }
   });
   asmrNodes = [];
+  currentGainNode = null;
 }
 
 function createNoise(type = "white") {
@@ -230,6 +245,7 @@ function playAsmr(selectedType) {
   const gain = audioCtx.createGain();
   gain.gain.value = Number(asmrVolume.value) / 100;
   gain.connect(audioCtx.destination);
+  currentGainNode = gain;
 
   if (selectedType === "tone") {
     const osc = audioCtx.createOscillator();
@@ -264,8 +280,8 @@ asmrType.addEventListener("change", () => {
 });
 
 asmrVolume.addEventListener("input", () => {
-  if (!audioCtx) return;
-  playAsmr(asmrType.value);
+  if (!audioCtx || !currentGainNode) return;
+  currentGainNode.gain.value = Number(asmrVolume.value) / 100;
 });
 
 addFriendBtn.addEventListener("click", () => {
