@@ -23,6 +23,7 @@ const STORAGE_KEY = "dorofomo-state-v1";
 let timerId = null;
 let isFocusMode = true;
 let timeLeftSeconds = Number(focusInput.value) * 60;
+let activeFocusSessionMinutes = clampMinutes(focusInput.value, 1, 180, 25);
 
 let state = {
   xp: 0,
@@ -142,7 +143,7 @@ function setTimeFromInputs() {
 }
 
 function addXpForSession() {
-  const gained = clampMinutes(focusInput.value, 1, 180, 25) * 10;
+  const gained = activeFocusSessionMinutes * 10;
   state.xp += gained;
   saveState();
   updateXpUI();
@@ -173,6 +174,12 @@ function tick() {
 
 function startTimer() {
   if (timerId) return;
+  if (isFocusMode) {
+    const configuredFocusMinutes = clampMinutes(focusInput.value, 1, 180, 25);
+    if (timeLeftSeconds === configuredFocusMinutes * 60) {
+      activeFocusSessionMinutes = configuredFocusMinutes;
+    }
+  }
   timerId = setInterval(tick, 1000);
 }
 
@@ -275,13 +282,16 @@ pauseBtn.addEventListener("click", pauseTimer);
 resetBtn.addEventListener("click", resetTimer);
 
 asmrType.addEventListener("change", () => {
-  ensureAudioContext();
   playAsmr(asmrType.value);
 });
 
 asmrVolume.addEventListener("input", () => {
   if (!audioCtx || !currentGainNode) return;
-  currentGainNode.gain.value = Number(asmrVolume.value) / 100;
+  currentGainNode.gain.setTargetAtTime(
+    Number(asmrVolume.value) / 100,
+    audioCtx.currentTime,
+    0.01
+  );
 });
 
 addFriendBtn.addEventListener("click", () => {
@@ -306,9 +316,11 @@ addFriendBtn.addEventListener("click", () => {
 friendList.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
-  const index = target.getAttribute("data-remove");
-  if (index === null) return;
-  state.friends.splice(Number(index), 1);
+  const rawIndex = target.getAttribute("data-remove");
+  if (rawIndex === null) return;
+  const index = Number(rawIndex);
+  if (!Number.isInteger(index) || index < 0 || index >= state.friends.length) return;
+  state.friends.splice(index, 1);
   saveState();
   renderFriends();
   renderRanking();
