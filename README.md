@@ -1,2 +1,13 @@
 # Dorofomo
-Intelligent Pomodoro timer using Copilot SDK and Microsoft Agent Framework with AI-powered motivation and learning analytics
+
+집중을 위한 포모도로 앱입니다. 아래 기능을 포함합니다.
+
+- ASMR 사운드(화이트 노이즈/비 소리/집중 톤)
+- XP 경험치 및 레벨업 시스템
+- 집중 시간/휴식 시간 조절
+- 친구 추가 및 친구 XP 관리
+- 나와 친구의 랭킹 표시
+
+## 실행 방법
+
+정적 웹 앱입니다. `index.html` 파일을 브라우저에서 열면 바로 사용할 수 있습니다.

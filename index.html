@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dorofomo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>🧠 Dorofomo</h1>
+      <p class="subtitle">포모도로 + ASMR + XP 레벨업</p>
+
+      <section class="card">
+        <h2>타이머 설정</h2>
+        <div class="settings-grid">
+          <label>
+            집중 시간(분)
+            <input id="focusMinutes" type="number" min="1" max="180" value="25" />
+          </label>
+          <label>
+            휴식 시간(분)
+            <input id="restMinutes" type="number" min="1" max="60" value="5" />
+          </label>
+        </div>
+        <p id="modeLabel">현재 모드: 집중</p>
+        <p id="noticeText" class="notice" aria-live="polite"></p>
+        <p id="timerDisplay" class="timer">25:00</p>
+        <div class="btn-row">
+          <button id="startBtn">시작</button>
+          <button id="pauseBtn" class="secondary">일시정지</button>
+          <button id="resetBtn" class="secondary">리셋</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>ASMR</h2>
+        <div class="settings-grid">
+          <label>
+            사운드
+            <select id="asmrType">
+              <option value="off">끄기</option>
+              <option value="white">화이트 노이즈</option>
+              <option value="rain">비 소리</option>
+              <option value="tone">집중 톤</option>
+            </select>
+          </label>
+          <label>
+            볼륨
+            <input id="asmrVolume" type="range" min="0" max="100" value="35" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>XP & 레벨</h2>
+        <p id="xpText">XP: 0 / 레벨: 1</p>
+        <div class="xp-track">
+          <div id="xpBar" class="xp-bar"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>친구 추가</h2>
+        <div class="friend-input-row">
+          <input id="friendName" type="text" placeholder="친구 이름" maxlength="20" />
+          <input id="friendXp" type="number" min="0" max="99999" value="0" />
+          <button id="addFriendBtn">추가</button>
+        </div>
+        <ul id="friendList"></ul>
+      </section>
+
+      <section class="card">
+        <h2>랭킹</h2>
+        <ol id="rankingList"></ol>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
