@@ -87,7 +87,13 @@ function renderFriends() {
 
   state.friends.forEach((friend, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `${friend.name} (XP ${friend.xp}) <button class="secondary" data-remove="${index}">삭제</button>`;
+    const label = document.createElement("span");
+    label.textContent = `${friend.name} (XP ${friend.xp}) `;
+    const removeButton = document.createElement("button");
+    removeButton.className = "secondary";
+    removeButton.setAttribute("data-remove", String(index));
+    removeButton.textContent = "삭제";
+    li.append(label, removeButton);
     friendList.appendChild(li);
   });
 }
@@ -131,6 +137,7 @@ function addXpForSession() {
 function tick() {
   timeLeftSeconds -= 1;
   if (timeLeftSeconds <= 0) {
+    pauseTimer();
     if (isFocusMode) {
       addXpForSession();
       alert("집중 세션 완료! XP를 획득했습니다.");
@@ -143,6 +150,9 @@ function tick() {
       ? clampMinutes(focusInput.value, 1, 180, 25)
       : clampMinutes(restInput.value, 1, 60, 5);
     timeLeftSeconds = nextMin * 60;
+    updateTimerUI();
+    startTimer();
+    return;
   }
   updateTimerUI();
 }
@@ -218,7 +228,7 @@ function playAsmr(selectedType) {
   clearAsmrNodes();
 
   const gain = audioCtx.createGain();
-  gain.gain.value = Number(asmrVolume.value) / 1000;
+  gain.gain.value = Number(asmrVolume.value) / 100;
   gain.connect(audioCtx.destination);
 
   if (selectedType === "tone") {
